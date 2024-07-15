@@ -27,6 +27,11 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// springdoc-openapi
+	// 스웨거 ui 뷰어와 스프링 웹플럭스를 모두 지원 모듈
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

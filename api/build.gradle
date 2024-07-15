@@ -19,6 +19,11 @@ dependencies {
     implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // springdoc-openapi
+    // annotation을 제공하는 모듈
+    implementation 'org.springdoc:springdoc-openapi-starter-common:2.0.2'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
