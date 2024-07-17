@@ -44,9 +44,12 @@ dependencies {
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
+	implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', classifier: 'osx-aarch_64'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 //	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 
 	implementation platform('org.testcontainers:testcontainers-bom:1.17.6')
 	testImplementation 'org.testcontainers:testcontainers'
