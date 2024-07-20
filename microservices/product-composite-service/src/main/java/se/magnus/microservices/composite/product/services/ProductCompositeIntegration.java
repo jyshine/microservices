@@ -56,6 +56,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     reviewServiceUrl = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review";
   }
 
+  // API 생성 및 삭제 오퍼레이션을 호툴할 수 있도록 통합계층을 확장
   @Override
   public Product createProduct(Product body) {
 
@@ -103,6 +104,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
   }
 
+  // API 생성 및 삭제 오퍼레이션을 호툴할 수 있도록 통합계층을 확장
   @Override
   public Recommendation createRecommendation(Recommendation body) {
 
@@ -153,6 +155,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
   }
 
+  // API 생성 및 삭제 오퍼레이션을 호툴할 수 있도록 통합계층을 확장
   @Override
   public Review createReview(Review body) {
 
