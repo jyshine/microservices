@@ -56,6 +56,22 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     reviewServiceUrl = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review?productId=";
   }
 
+  @Override
+  public Product createProduct(Product body) {
+    try {
+      String url = productServiceUrl;
+      LOG.debug("Will post a new product to URL: {}", url);
+
+      Product product = restTemplate.postForObject(url, body, Product.class);
+      LOG.debug("Created a product with id: {}", product.getProductId());
+
+      return product;
+
+    } catch (HttpClientErrorException ex) {
+      throw handleHttpClientException(ex);
+    }
+  }
+
   public Product getProduct(int productId) {
 
     try {
@@ -81,6 +97,19 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
           LOG.warn("Error body: {}", ex.getResponseBodyAsString());
           throw ex;
       }
+    }
+  }
+
+  @Override
+  public void deleteProduct(int productId) {
+    try {
+      String url = productServiceUrl + "/" + productId;
+      LOG.debug("Will call the deleteProduct API on URL: {}", url);
+
+      restTemplate.delete(url);
+
+    } catch (HttpClientErrorException ex) {
+      throw handleHttpClientException(ex);
     }
   }
 
@@ -129,4 +158,22 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
       return new ArrayList<>();
     }
   }
+
+  private RuntimeException handleHttpClientException(HttpClientErrorException ex) {
+    switch (HttpStatus.resolve(ex.getStatusCode().value())) {
+
+      case NOT_FOUND:
+        return new NotFoundException(getErrorMessage(ex));
+
+      case UNPROCESSABLE_ENTITY:
+        return new InvalidInputException(getErrorMessage(ex));
+
+      default:
+        LOG.warn("Got an unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+        LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+        return ex;
+    }
+  }
+
+
 }
