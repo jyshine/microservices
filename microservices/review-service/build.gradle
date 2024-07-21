@@ -9,6 +9,7 @@ version = '1.0.0-SNAPSHOT'
 
 ext {
 	mapstructVersion = "1.5.3.Final"
+	springCloudVersion = "2022.0.1"
 }
 
 java {

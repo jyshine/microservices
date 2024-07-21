@@ -13,6 +13,10 @@ java {
 	}
 }
 
+ext {
+	springCloudVersion = "2022.0.1"
+}
+
 repositories {
 	mavenCentral()
 }
