@@ -28,7 +28,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	// spring data
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
 
 	// mapstruct
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
@@ -39,6 +39,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 //	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', classifier: 'osx-aarch_64'
 
 	// test
 	implementation platform('org.testcontainers:testcontainers-bom:1.17.6')
