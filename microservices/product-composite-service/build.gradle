@@ -27,6 +27,9 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	// kafka, rabbitmq
+	implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
+	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
 
 	// springdoc-openapi
 	// 스웨거 ui 뷰어와 스프링 웹플럭스를 모두 지원 모듈
@@ -34,7 +37,11 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// 이벤트 테스트를 위해 추가
+	testImplementation 'org.springframework.cloud:spring-cloud-stream-test-binder'
+//	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 }
 
 tasks.named('test') {

@@ -30,6 +30,10 @@ dependencies {
 	// spring data
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
 
+	// kafka rabbitmq
+	implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
+	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
+
 	// mapstruct
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
@@ -40,7 +44,7 @@ dependencies {
 	testImplementation 'io.projectreactor:reactor-test'
 //	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', classifier: 'osx-aarch_64'
+//	implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', classifier: 'osx-aarch_64'
 
 	// test
 	implementation platform('org.testcontainers:testcontainers-bom:1.17.6')
