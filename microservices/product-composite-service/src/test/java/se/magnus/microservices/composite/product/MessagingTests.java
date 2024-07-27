@@ -61,8 +61,8 @@ class MessagingTests {
     postAndVerifyProduct(composite, ACCEPTED);
 
     final List<String> productMessages = getMessages("products");
-//    final List<String> recommendationMessages = getMessages("recommendations");
-//    final List<String> reviewMessages = getMessages("reviews");
+    final List<String> recommendationMessages = getMessages("recommendations");
+    final List<String> reviewMessages = getMessages("reviews");
 
     // Assert one expected new product event queued up
     assertEquals(1, productMessages.size());
@@ -72,8 +72,8 @@ class MessagingTests {
     assertThat(productMessages.get(0), is(sameEventExceptCreatedAt(expectedEvent)));
 
     // Assert no recommendation and review events
-//    assertEquals(0, recommendationMessages.size());
-//    assertEquals(0, reviewMessages.size());
+    assertEquals(0, recommendationMessages.size());
+    assertEquals(0, reviewMessages.size());
   }
 
   @Test
