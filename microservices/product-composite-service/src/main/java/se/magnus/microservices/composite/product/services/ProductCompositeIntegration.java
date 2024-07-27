@@ -3,6 +3,7 @@ package se.magnus.microservices.composite.product.services;
 import static java.util.logging.Level.FINE;
 import static org.springframework.http.HttpMethod.GET;
 import static reactor.core.publisher.Flux.empty;
+import static se.magnus.api.event.Event.Type.CREATE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -11,9 +12,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -21,12 +26,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import se.magnus.api.core.product.Product;
 import se.magnus.api.core.product.ProductService;
 import se.magnus.api.core.recommendation.Recommendation;
 import se.magnus.api.core.recommendation.RecommendationService;
 import se.magnus.api.core.review.Review;
 import se.magnus.api.core.review.ReviewService;
+import se.magnus.api.event.Event;
 import se.magnus.api.exceptions.InvalidInputException;
 import se.magnus.api.exceptions.NotFoundException;
 import se.magnus.util.http.HttpErrorInfo;
@@ -43,10 +50,17 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   private final String recommendationServiceUrl;
   private final String reviewServiceUrl;
 
+  private final StreamBridge streamBridge;
+  private final Scheduler publishEventScheduler;
+
   @Autowired
   public ProductCompositeIntegration(
+          @Qualifier("publishEventScheduler") Scheduler publishEventScheduler,
+
           WebClient.Builder webClient,
           ObjectMapper mapper,
+          StreamBridge streamBridge,
+
           @Value("${app.product-service.host}") String productServiceHost,
           @Value("${app.product-service.port}") int productServicePort,
           @Value("${app.recommendation-service.host}") String recommendationServiceHost,
@@ -56,6 +70,8 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     this.webClient = webClient.build();
     this.mapper = mapper;
+    this.streamBridge = streamBridge;
+    this.publishEventScheduler = publishEventScheduler;
 
     productServiceUrl = "http://" + productServiceHost + ":" + productServicePort + "/product";
     recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort + "/recommendation";
@@ -132,7 +148,19 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
   @Override
   public Mono<Product> createProduct(Product body) {
-    return null;
+
+    return Mono.fromCallable(()->{
+      sendMessage("products-out-0", new Event(CREATE, body.getProductId(), body));
+      return body;
+    }).subscribeOn(publishEventScheduler);
+  }
+
+  private void sendMessage(String bindingName, Event event) {
+    LOG.debug("Sending a {} message to {}", event.getEventType(), bindingName);
+    Message message = MessageBuilder.withPayload(event)
+            .setHeader("partitionKey", event.getKey())
+            .build();
+    streamBridge.send(bindingName, message);
   }
 
   @Override

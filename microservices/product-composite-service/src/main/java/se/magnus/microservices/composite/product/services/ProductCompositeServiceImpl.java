@@ -2,6 +2,7 @@ package se.magnus.microservices.composite.product.services;
 
 import static java.util.logging.Level.FINE;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -13,7 +14,6 @@ import se.magnus.api.composite.product.*;
 import se.magnus.api.core.product.Product;
 import se.magnus.api.core.recommendation.Recommendation;
 import se.magnus.api.core.review.Review;
-import se.magnus.api.exceptions.NotFoundException;
 import se.magnus.util.http.ServiceUtil;
 
 @RestController
@@ -53,7 +53,39 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
   @Override
   public Mono<Void> createProduct(ProductAggregate body) {
-    return null;
+    try {
+
+      List<Mono> monoList = new ArrayList<>();
+
+      LOG.info("Will create a new composite entity for product.id: {}", body.getProductId());
+
+      Product product = new Product(body.getProductId(), body.getName(), body.getWeight(), null);
+      monoList.add(integration.createProduct(product));
+
+//      if (body.getRecommendations() != null) {
+//        body.getRecommendations().forEach(r -> {
+//          Recommendation recommendation = new Recommendation(body.getProductId(), r.getRecommendationId(), r.getAuthor(), r.getRate(), r.getContent(), null);
+//          monoList.add(integration.createRecommendation(recommendation));
+//        });
+//      }
+//
+//      if (body.getReviews() != null) {
+//        body.getReviews().forEach(r -> {
+//          Review review = new Review(body.getProductId(), r.getReviewId(), r.getAuthor(), r.getSubject(), r.getContent(), null);
+//          monoList.add(integration.createReview(review));
+//        });
+//      }
+
+      LOG.debug("createCompositeProduct: composite entities created for productId: {}", body.getProductId());
+
+      return Mono.zip(r -> "", monoList.toArray(new Mono[0]))
+              .doOnError(ex -> LOG.warn("createCompositeProduct failed: {}", ex.toString()))
+              .then();
+
+    } catch (RuntimeException re) {
+      LOG.warn("createCompositeProduct failed: {}", re.toString());
+      throw re;
+    }
   }
 
 

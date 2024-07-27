@@ -13,10 +13,9 @@ public interface ProductCompositeService {
 
   /**
    * Sample usage, see below.
-   *
-   * curl -X POST $HOST:$PORT/product-composite \
-   *   -H "Content-Type: application/json" --data \
-   *   '{"productId":123,"name":"product 123","weight":123}'
+   * <p>
+   * curl -X POST $HOST:$PORT/product-composite \ -H "Content-Type: application/json" --data \
+   * '{"productId":123,"name":"product 123","weight":123}'
    *
    * @param body A JSON representation of the new composite product
    */
