@@ -133,4 +133,6 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
     return new ProductAggregate(productId, name, weight, recommendationSummaries, reviewSummaries, serviceAddresses);
   }
+
+
 }
