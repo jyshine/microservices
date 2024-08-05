@@ -1,63 +1,52 @@
+# SpringDoc 설정 - Swagger UI 및 API 문서 경로 설정
 springdoc:
-  swagger-ui.path: /openapi/swagger-ui.html
-  api-docs.path: /openapi/v3/api-docs
-  packagesToScan: se.magnus.microservices.composite.product
-  pathsToMatch: /**
+  swagger-ui.path: /openapi/swagger-ui.html # Swagger UI의 접근 경로 설정
+  api-docs.path: /openapi/v3/api-docs # API 문서의 접근 경로 설정
+  packagesToScan: se.magnus.microservices.composite.product # Swagger가 스캔할 패키지 설정
+  pathsToMatch: /** # Swagger가 스캔할 경로 패턴 설정
 
+# API 정보 설정 - API 메타데이터 및 응답 코드 설명 설정
 api:
   common:
-    version: 1.0.0
-    title: Sample API
-    description: Description of the API...
-    termsOfService: MY TERMS OF SERVICE
-    license: MY LICENSE
-    licenseUrl: MY LICENSE URL
+    version: 1.0.0 # API 버전
+    title: Sample API # API 제목
+    description: Description of the API... # API 설명
+    termsOfService: MY TERMS OF SERVICE # 서비스 약관 URL
+    license: MY LICENSE # 라이선스 이름
+    licenseUrl: MY LICENSE URL # 라이선스 URL
 
-    externalDocDesc: MY WIKI PAGE
-    externalDocUrl: MY WIKI URL
+    externalDocDesc: MY WIKI PAGE # 외부 문서 설명
+    externalDocUrl: MY WIKI URL # 외부 문서 URL
     contact:
-      name: NAME OF CONTACT
-      url: URL TO CONTACT
-      email: contact@mail.com
+      name: NAME OF CONTACT # 연락처 이름
+      url: URL TO CONTACT # 연락처 URL
+      email: contact@mail.com # 연락처 이메일
 
+  # API 응답 코드 설명 설정
   responseCodes:
-    ok.description: OK
-    badRequest.description: Bad Request, invalid format of the request. See response message for more information
-    notFound.description: Not found, the specified id does not exist
-    unprocessableEntity.description: Unprocessable entity, input parameters caused the processing to fail. See response message for more information
+    ok.description: OK # 200 응답 설명
+    badRequest.description: Bad Request, invalid format of the request. See response message for more information # 400 응답 설명
+    notFound.description: Not found, the specified id does not exist # 404 응답 설명
+    unprocessableEntity.description: Unprocessable entity, input parameters caused the processing to fail. See response message for more information # 422 응답 설명
 
+  # Product Composite API 설정 - 각 API 엔드포인트의 설명 및 응답 코드 설정
   product-composite:
-
     get-composite-product:
-      description: Returns a composite view of the specified product id
+      description: Returns a composite view of the specified product id # API 설명
       notes: |
         # Normal response
         If the requested product id is found the method will return information regarding:
-        1. Base product information
+        1. Product information
         1. Reviews
         1. Recommendations
         1. Service Addresses\n(technical information regarding the addresses of the microservices that created the response)
 
         # Expected partial and error responses
-        In the following cases, only a partial response be created (used to simplify testing of error conditions)
-
-        ## Product id 113
-        200 - Ok, but no recommendations will be returned
-
-        ## Product id 213
-        200 - Ok, but no reviews will be returned
-
-        ## Non numerical product id
-        400 - A **Bad Request** error will be returned
-
-        ## Product id 13
-        404 - A **Not Found** error will be returned
-
-        ## Negative product ids
-        422 - An **Unprocessable Entity** error will be returned
+        1. If no product information is found, a **404 - Not Found** error will be returned
+        1. In no recommendations or reviews are found for a product, a partial response will be returned
 
     create-composite-product:
-      description: Creates a composite product
+      description: Creates a composite product # API 설명
       notes: |
         # Normal response
         The composite product information posted to the API will be split up and stored as separate product-info, recommendation and review entities.
@@ -67,7 +56,7 @@ api:
            an **422 - Unprocessable Entity** error with a "duplicate key" error message will be returned
 
     delete-composite-product:
-      description: Deletes a product composite
+      description: Deletes a product composite # API 설명
       notes: |
         # Normal response
         Entities for product information, recommendations and reviews related to the specified productId will be deleted.
@@ -75,69 +64,116 @@ api:
 
         This means that a delete request of a non-existing product will return **200 Ok**.
 
+# 서버 설정 - 서버 포트 및 에러 메시지 포함 설정
+server.port: 7000 # 서버 포트 번호
+server.error.include-message: always # 에러 메시지 포함 설정
 
-
-server.port: 7000
-server.error.include-message: always
-
-
+# 애플리케이션 서비스 설정 - 각 마이크로서비스의 호스트 및 포트 설정
 app:
   product-service:
-    host: localhost
-    port: 7001
+    host: localhost # Product 서비스 호스트
+    port: 7001 # Product 서비스 포트
   recommendation-service:
-    host: localhost
-    port: 7002
+    host: localhost # Recommendation 서비스 호스트
+    port: 7002 # Recommendation 서비스 포트
   review-service:
-    host: localhost
-    port: 7003
+    host: localhost # Review 서비스 호스트
+    port: 7003 # Review 서비스 포트
 
+# Spring Cloud Stream 설정 - 메시지 바인더 및 바인딩 설정
 spring.cloud.stream:
-  default.contentType: application/json
+  defaultBinder: rabbit # 기본 바인더를 RabbitMQ로 설정
+  default.contentType: application/json # 기본 메시지 컨텐츠 타입을 JSON으로 설정
   bindings:
     products-out-0:
-      destination: products
+      destination: products # 메시지를 전송할 RabbitMQ 큐 또는 Kafka 토픽
       producer:
-        required-groups: auditGroup
+        required-groups: auditGroup # 필수 그룹 설정
     recommendations-out-0:
-      destination: recommendations
+      destination: recommendations # 메시지를 전송할 RabbitMQ 큐 또는 Kafka 토픽
       producer:
-        required-groups: auditGroup
+        required-groups: auditGroup # 필수 그룹 설정
     reviews-out-0:
-      destination: reviews
+      destination: reviews # 메시지를 전송할 RabbitMQ 큐 또는 Kafka 토픽
       producer:
-        required-groups: auditGroup
+        required-groups: auditGroup # 필수 그룹 설정
 
+# Kafka 바인더 설정 - Kafka 브로커 및 포트 설정
+spring.cloud.stream.kafka.binder:
+  brokers: 127.0.0.1 # Kafka 브로커 주소
+  defaultBrokerPort: 9092 # Kafka 브로커 포트
+
+# RabbitMQ 설정 - RabbitMQ 연결 정보 설정
+spring.rabbitmq:
+  host: 127.0.0.1 # RabbitMQ 호스트 주소
+  port: 5672 # RabbitMQ 포트
+  username: guest # RabbitMQ 사용자 이름
+  password: guest # RabbitMQ 비밀번호
+
+# 로깅 설정 - 로깅 레벨 설정
 logging:
   level:
-    root: INFO
-    se.magnus: DEBUG
----
-spring.cloud.stream.bindings.products-out-0.producer:
-  partition-key-expression: headers['partitionKey']
-  partition-count: 2
+    root: INFO # 루트 로깅 레벨
+    se.magnus: DEBUG # 특정 패키지 로깅 레벨
 
-spring.cloud.stream.bindings.recommendations-out-0.producer:
-  partition-key-expression: headers['partitionKey']
-  partition-count: 2
+# 관리 엔드포인트 설정 - 헬스 체크 및 노출 설정
+management.endpoint.health.show-details: "ALWAYS" # 헬스 체크 상세 정보 포함 설정
+management.endpoints.web.exposure.include: "*" # 노출할 엔드포인트 설정
 
-spring.cloud.stream.bindings.reviews-out-0.producer:
-  partition-key-expression: headers['partitionKey']
-  partition-count: 2
-
+# Docker 프로파일 설정
 ---
 spring.config.activate.on-profile: docker
-server.port: 8080
+
+server.port: 8080 # Docker 프로파일에서의 서버 포트
 
 app:
   product-service:
-    host: product
-    port: 8080
+    host: product # Docker 프로파일에서의 Product 서비스 호스트
+    port: 8080 # Docker 프로파일에서의 Product 서비스 포트
   recommendation-service:
-    host: recommendation
-    port: 8080
+    host: recommendation # Docker 프로파일에서의 Recommendation 서비스 호스트
+    port: 8080 # Docker 프로파일에서의 Recommendation 서비스 포트
   review-service:
-    host: review
-    port: 8080
+    host: review # Docker 프로파일에서의 Review 서비스 호스트
+    port: 8080 # Docker 프로파일에서의 Review 서비스 포트
 
+spring.rabbitmq.host: rabbitmq # Docker 프로파일에서의 RabbitMQ 호스트
 
+spring.cloud.stream.kafka.binder.brokers: kafka # Docker 프로파일에서의 Kafka 브로커
+
+# 스트리밍 파티셔닝 설정 - 메시지 파티셔닝 설정
+---
+spring.config.activate.on-profile: streaming_partitioned
+
+spring.cloud.stream.bindings.products-out-0.producer:
+  partition-key-expression: headers['partitionKey'] # 파티션 키 표현식
+  partition-count: 2 # 파티션 개수
+
+spring.cloud.stream.bindings.recommendations-out-0.producer:
+  partition-key-expression: headers['partitionKey'] # 파티션 키 표현식
+  partition-count: 2 # 파티션 개수
+
+spring.cloud.stream.bindings.reviews-out-0.producer:
+  partition-key-expression: headers['partitionKey'] # 파티션 키 표현식
+  partition-count: 2 # 파티션 개수
+
+# 인스턴스 0 설정 - 스트리밍 인스턴스 0 설정
+---
+spring.config.activate.on-profile: streaming_instance_0
+
+spring.cloud.stream.bindings.messageProcessor-in-0.consumer.instanceIndex: 0 # 인스턴스 인덱스 0
+
+# 인스턴스 1 설정 - 스트리밍 인스턴스 1 설정
+---
+spring.config.activate.on-profile: streaming_instance_1
+
+spring.cloud.stream.bindings.messageProcessor-in-0.consumer.instanceIndex: 1 # 인스턴스 인덱스 1
+
+# Kafka 프로파일 설정 - Kafka 프로파일에서의 설정
+---
+spring.config.activate.on-profile: kafka
+
+management.health.rabbit.enabled: false # Kafka 프로파일에서 RabbitMQ 헬스 체크 비활성화
+spring.cloud.stream.defaultBinder: kafka # Kafka를 기본 바인더로 설정
+spring.kafka.bootstrap-servers: kafka:9092 # Kafka 부트스트랩 서버 주소
+spring.cloud.stream.kafka.binder.replication-factor: 1 # Kafka 복제 인수 설정
